@@ -26,19 +26,6 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
         }
     }
 
-    private void JTableAlunosMouseClicked(java.awt.event.MouseEvent evt) {
-        if (this.JTableAlunos.getSelectedRow() != -1) {
-            String nome = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 1).toString();
-            String idade = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 2).toString();
-            String curso = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 3).toString();
-            String fase = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 4).toString();
-            this.JTFNome.setText(nome);
-            this.JTFIdade.setText(idade);
-            this.JTFCurso.setText(curso);
-            this.JTFFase.setText(fase);
-        }
-    }
-
     public FrmGerenciarAluno() {
         initComponents();
         this.objetoaluno = new Aluno(); // carrega objetoaluno de aluno
@@ -76,6 +63,11 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
                 "ID", "Nome", "Idade", "Curso", "Fase"
             }
         ));
+        JTableAlunos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JTableAlunosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(JTableAlunos);
 
         jLabel1.setText("Nome:");
@@ -113,6 +105,11 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
         });
 
         JBAlterar.setText("Alterar");
+        JBAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JBAlterarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -196,18 +193,109 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
         this.dispose();        this.dispose();    }//GEN-LAST:event_JBCancelarActionPerformed
 
     private void JBApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JBApagarActionPerformed
-        // TODO add your handling code here:
+        try {
+            // validando dados da interface gráfica.
+            int id = 0;
+            if (this.JTableAlunos.getSelectedRow() == -1) {
+                throw new Mensagem("Primeiro Selecione um Aluno para APAGAR");
+            } else {
+                id = Integer.parseInt(this.JTableAlunos.
+                        getValueAt(this.JTableAlunos.getSelectedRow(), 0).
+                        toString());
+            }
+            // retorna 0 -> primeiro botão | 1 -> segundo botão | 2 -> terceiro botão
+            int respostaUsuario = JOptionPane.
+                    showConfirmDialog(null,
+                            "Tem certeza que deseja apagar este Aluno ?");
+            if (respostaUsuario == 0) {// clicou em SIM
+                // envia os dados para o Aluno processar
+                if (this.objetoaluno.deleteAlunoBD(id)) {
+                    // limpa os campos
+                    this.JTFNome.setText("");
+                    this.JTFIdade.setText("");
+                    this.JTFCurso.setText("");
+                    this.JTFFase.setText("");
+                    JOptionPane.showMessageDialog(rootPane, "Aluno Apagado com Sucesso!");
+                }
+            }
+            // atualiza a tabela.
+            System.out.println(this.objetoaluno.getMinhaLista().toString());
+        } catch (Mensagem erro) {
+            JOptionPane.showMessageDialog(null, erro.getMessage());
+        } finally {
+            // atualiza a tabela.
+            carregaTabela();
+        }
     }//GEN-LAST:event_JBApagarActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    private void JBAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JBAlterarActionPerformed
+        try {
+            // recebendo e validando dados da interface gráfica.
+            int id = 0;
+            String nome = "";
+            int idade = 0;
+            String curso = "";
+            int fase = 0;
+            if (this.JTFNome.getText().length() < 2) {
+                throw new Mensagem("Nome deve conter ao menos 2 caracteres.");
+            } else {
+                nome = this.JTFNome.getText();
+            }
+            if (this.JTFIdade.getText().length() <= 0) {
+                throw new Mensagem("Idade deve ser número e maior que zero.");
+            } else {
+                idade = Integer.parseInt(this.JTFIdade.getText());
+            }
+            if (this.JTFCurso.getText().length() < 2) {
+                throw new Mensagem("Curso deve conter ao menos 2 caracteres.");
+            } else {
+                curso = this.JTFCurso.getText();
+            }
+            if (this.JTFFase.getText().length() <= 0) {
+                throw new Mensagem("Fase deve ser número e maior que zero.");
+            } else {
+                fase = Integer.parseInt(this.JTFFase.getText());
+            }
+            if (this.JTableAlunos.getSelectedRow() == -1) {
+                throw new Mensagem("Primeiro Selecione um Aluno para Alterar");
+            } else {
+                id = Integer.parseInt(this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 0).toString());
+            }
+            // envia os dados para o Aluno processar
+            if (this.objetoaluno.updateAlunoBD(id, nome, idade, curso, fase)) {
+                // limpa os campos
+                this.JTFNome.setText("");
+                this.JTFIdade.setText("");
+                this.JTFCurso.setText("");
+                this.JTFFase.setText("");
+                JOptionPane.showMessageDialog(rootPane, "Aluno Alterado com Sucesso!");
+            }
+            //Exibe no console o aluno cadastrado
+            System.out.println(this.objetoaluno.getMinhaLista().toString());
+        } catch (Mensagem erro) {
+            JOptionPane.showMessageDialog(null, erro.getMessage());
+        } catch (NumberFormatException erro2) {
+            JOptionPane.showMessageDialog(null, "Informe um número válido.");
+        } finally {
+            // atualiza a tabela.
+            carregaTabela();
+        }
+    }//GEN-LAST:event_JBAlterarActionPerformed
+
+    private void JTableAlunosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTableAlunosMouseClicked
+        if (this.JTableAlunos.getSelectedRow() != -1) {
+            String nome = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 1).toString();
+            String idade = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 2).toString();
+            String curso = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 3).toString();
+            String fase = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 4).toString();
+            this.JTFNome.setText(nome);
+            this.JTFIdade.setText(idade);
+            this.JTFCurso.setText(curso);
+            this.JTFFase.setText(fase);
+        }    }//GEN-LAST:event_JTableAlunosMouseClicked
+
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
