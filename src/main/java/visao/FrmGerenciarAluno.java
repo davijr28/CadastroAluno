@@ -10,9 +10,39 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
 
     private Aluno objetoaluno;
 
+    public void carregaTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) this.JTableAlunos.getModel();
+        modelo.setNumRows(0); //Posiciona na primeira linha da tabela
+        //Carrega a lista de objetos aluno
+        ArrayList<Aluno> minhaLista = objetoaluno.getMinhaLista();
+        for (Aluno a : minhaLista) {
+            modelo.addRow(new Object[]{
+                a.getId(),
+                a.getNome(),
+                a.getIdade(),
+                a.getCurso(),
+                a.getFase()
+            });
+        }
+    }
+
+    private void JTableAlunosMouseClicked(java.awt.event.MouseEvent evt) {
+        if (this.JTableAlunos.getSelectedRow() != -1) {
+            String nome = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 1).toString();
+            String idade = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 2).toString();
+            String curso = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 3).toString();
+            String fase = this.JTableAlunos.getValueAt(this.JTableAlunos.getSelectedRow(), 4).toString();
+            this.JTFNome.setText(nome);
+            this.JTFIdade.setText(idade);
+            this.JTFCurso.setText(curso);
+            this.JTFFase.setText(fase);
+        }
+    }
+
     public FrmGerenciarAluno() {
         initComponents();
         this.objetoaluno = new Aluno(); // carrega objetoaluno de aluno
+        this.carregaTabela();
     }
 
     @SuppressWarnings("unchecked")
@@ -20,7 +50,7 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        JTableAlunos = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -35,7 +65,7 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        JTableAlunos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -46,7 +76,7 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
                 "ID", "Nome", "Idade", "Curso", "Fase"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(JTableAlunos);
 
         jLabel1.setText("Nome:");
 
@@ -212,11 +242,11 @@ public class FrmGerenciarAluno extends javax.swing.JFrame {
     private javax.swing.JTextField JTFFase;
     private javax.swing.JTextField JTFIdade;
     private javax.swing.JTextField JTFNome;
+    private javax.swing.JTable JTableAlunos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }
